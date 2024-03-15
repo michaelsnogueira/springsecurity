@@ -1,0 +1,17 @@
+spring:
+  application:
+    name: springsecurity
+  sql:
+    init:
+      mode: always
+  datasource:
+    url: jdbc:mysql://${MYSQL_HOST:localhost}:3306/mydb
+    username: admin
+    password: 123
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+#    defer-datasource-initialization: true
+
