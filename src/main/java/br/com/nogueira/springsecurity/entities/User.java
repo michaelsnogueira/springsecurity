@@ -1,6 +1,8 @@
 package br.com.nogueira.springsecurity.entities;
 
+import br.com.nogueira.springsecurity.controller.dto.LoginRequest;
 import jakarta.persistence.*;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.util.Set;
 import java.util.UUID;
@@ -54,5 +56,9 @@ public class User {
 
     public void setRoles(Set<Role> roles) {
         this.roles = roles;
+    }
+
+    public boolean isLoginCorrect(LoginRequest loginRequest, BCryptPasswordEncoder bCryptPasswordEncoder) {
+        return bCryptPasswordEncoder.matches(loginRequest.password(), this.password);
     }
 }
