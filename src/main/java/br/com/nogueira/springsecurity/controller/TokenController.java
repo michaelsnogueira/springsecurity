@@ -2,6 +2,7 @@ package br.com.nogueira.springsecurity.controller;
 
 import br.com.nogueira.springsecurity.controller.dto.LoginRequest;
 import br.com.nogueira.springsecurity.controller.dto.LoginResponse;
+import br.com.nogueira.springsecurity.entities.Role;
 import br.com.nogueira.springsecurity.entities.User;
 import br.com.nogueira.springsecurity.repository.UserRepository;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.time.Instant;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/token")
@@ -41,13 +43,19 @@ public class TokenController {
         }
         var now = Instant.now();
         var expiresAt = 300L;
+        var scopes = user.get().getRoles()
+                .stream()
+                .map(Role::getName)
+                .collect(Collectors.joining(" "));
+
         JwtClaimsSet claims = JwtClaimsSet.builder()
                 .issuer("mybackend")
                 .subject(user.get().getId().toString())
-                .expiresAt(now.plusSeconds(expiresAt))
                 .issuedAt(now)
+                .claim("scope", scopes)
+                .expiresAt(now.plusSeconds(expiresAt))
                 .build();
-        Jwt encode = jwtEncoder.encode(JwtEncoderParameters.from(claims));
-        return ResponseEntity.ok(new LoginResponse(encode.toString(), expiresAt));
+        var encode = jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();
+        return ResponseEntity.ok(new LoginResponse(encode, expiresAt));
     }
 }
